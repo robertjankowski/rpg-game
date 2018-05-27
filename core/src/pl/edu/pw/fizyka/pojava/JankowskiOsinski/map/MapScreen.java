@@ -1,8 +1,10 @@
 package pl.edu.pw.fizyka.pojava.JankowskiOsinski.map;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -10,9 +12,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.Constants;
@@ -20,6 +19,9 @@ import pl.edu.pw.fizyka.pojava.JankowskiOsinski.MyMusic;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Bot;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Knight;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Person;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.PersonTemplate;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Wizard;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.ui.LogIn;
 
 public class MapScreen implements Screen {
 	public static final String TAG = MapScreen.class.getName();
@@ -38,8 +40,9 @@ public class MapScreen implements Screen {
 	private int[] layerBottom = { 0 };
 	private int[] layerTop = { 3 };
 
-	private Knight knight;
-	public Bot bots;
+	// I want to choose which character render
+	public PersonTemplate player;
+	public Map<String, Bot> mapBots;
 
 	boolean isFirstInit = true;
 	boolean isZooming = false;
@@ -50,18 +53,17 @@ public class MapScreen implements Screen {
 
 	@Override
 	public void show() {
-		// aby nie resetowały się statystyki bohatera
+		// not to restart player stats
 		if (isFirstInit) {
 			init(Constants.startPositionX, Constants.startPositionY, Constants.mapName, Constants.FORREST_MUSIC);
 			initPlayer(Constants.startPositionX, Constants.startPositionY);
 			isFirstInit = false;
 		}
-		// knight.isCollideWithSecondLayer(tiledMapRenderer);
-		mapPlayerStats.show(knight);
+		mapPlayerStats.show(player);
 	}
 
 	private void initPlayer(float posX, float posY) {
-		knight.loadStartingStart();
+		player.loadStartingStart();
 	}
 
 	// initialize variable
@@ -75,13 +77,29 @@ public class MapScreen implements Screen {
 		camera.setToOrtho(false, width, height);
 		tiledMap = new TmxMapLoader().load(map);
 		tiledMapRenderer = new TextureMapObjectRenderer(tiledMap);
-		knight = new Knight(camera, new Vector2(posX, posY));
-		// tak zrobilem, bo nie ma botow na nowej mapie !
+
+		// here I have to get from database which type to render
+		switch (LogIn.role) {
+		case "knight":
+			player = new Knight(camera, new Vector2(posX, posY), Constants.KNIGHT_IMG);
+			break;
+		case "sorcerer":
+			player = new Wizard(camera, new Vector2(posX, posY), Constants.WIZARD_IMG);
+			break;
+		default:
+			System.out.println("Error, couldn't find vacation");
+			break;
+		}
+
+		System.out.println(player.getClass().getName());
+		// because, there aren't any bots in next map
 		try {
-			bots = new Bot(tiledMapRenderer);
+			// render monsters
+			mapBots = renderMonster(tiledMapRenderer, Constants.BOTS_NAMES);
 		} catch (Exception ex) {
 		}
-		// żeby znaleźć rozmiar mapy
+
+		// to get map size
 		TiledMapTileLayer layer = (TiledMapTileLayer) tiledMapRenderer.getMap().getLayers().get(0);
 		MAP_WIDTH = layer.getTileWidth() * layer.getWidth();
 		MAP_HEIGHT = layer.getTileHeight() * layer.getHeight();
@@ -101,18 +119,19 @@ public class MapScreen implements Screen {
 		tiledMapRenderer.setView(camera);
 		if (isFirstMap) {
 			tiledMapRenderer.render(layerBottom);
-			bots.update(delta);
-			knight.update(delta, this);
+			mapBots.forEach((k, v) -> v.update(Gdx.graphics.getDeltaTime()));
+			player.update(delta, this);
 			tiledMapRenderer.render(layerTop);
 		}
-		// tu teleport do innej mapy !
+
+		// teleport
 		if (!isFirstMap) {
 			// jeszcze jakies boty
 			tiledMapRenderer.render(layerBottom);
-			knight.update(delta, this);
+			player.update(delta, this);
 		}
 		// Zoom out effect and reseting map
-		if (isEndOfGame(knight, getTiledMapRenderer())) {
+		if (isNextMap(player)) {
 			long endTime = TimeUtils.nanoTime();
 			isZooming = false;
 			while (!isZooming) {
@@ -120,12 +139,12 @@ public class MapScreen implements Screen {
 					isFirstMap = false;
 					music.stopPlay();
 					// save stats before changing the map !
-					int[] stats = { knight.getHp(), knight.getMana(), knight.getGold(), knight.getAttackLevel(),
-							knight.getMagicLevel(), knight.getExperience() };
-					knight.getWalkMusic().stopPlay();
+					int[] stats = { player.getHp(), player.getMana(), player.getGold(), player.getAttackLevel(),
+							player.getMagicLevel(), player.getExperience() };
+					player.getWalkMusic().stopPlay();
 					init(Constants.endPositionX, Constants.endPositionY, Constants.nextMapName,
 							Constants.DESSERT_MUSIC);
-					knight.saveStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]);
+					player.saveStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]);
 					isZooming = true;
 					endTime = TimeUtils.nanoTime();
 				}
@@ -139,33 +158,30 @@ public class MapScreen implements Screen {
 		camera.update();
 	}
 
-	// check player position on the map
-	public boolean isEndOfGame(Person person, OrthogonalTiledMapRenderer mapRenderer) {
-		// get first layer and calculate center of the map
-		TiledMapTileLayer layer = (TiledMapTileLayer) mapRenderer.getMap().getLayers().get(0);
-		float width = layer.getTileWidth() * layer.getWidth();
-		float height = layer.getTileHeight() * layer.getHeight();
-		// is in "circle"
-		if (person.getPosition().dst(width / 2, height / 2) < 10) {
-			return true;
-		}
-
-		// pozycja posągu (650,1140) + 32
-		if (((Math.pow(person.getPosition().x - 650, 2)) + (Math.pow(person.getPosition().y - 1140, 2))) < 60
-				|| ((Math.pow(person.getPosition().x - 620, 2)) + (Math.pow(person.getPosition().y - 1172, 2))) < 60
-				|| ((Math.pow(person.getPosition().x - 620, 2)) + (Math.pow(person.getPosition().y - 1140, 2))) < 60
-				|| ((Math.pow(person.getPosition().x - 650, 2)) + (Math.pow(person.getPosition().y - 1172, 2))) < 60) {
-			camera.zoom += 0.3;
+	private boolean isNextMap(Person person) {
+		if (((Math.pow(person.getPosition().x - 654, 2)) + (Math.pow(person.getPosition().y - 1122, 2))) < 60
+				|| ((Math.pow(person.getPosition().x - 654, 2)) + (Math.pow(person.getPosition().y - 1172, 2))) < 60
+				|| ((Math.pow(person.getPosition().x - 689, 2)) + (Math.pow(person.getPosition().y - 1122, 2))) < 60
+				|| ((Math.pow(person.getPosition().x - 689, 2)) + (Math.pow(person.getPosition().y - 1172, 2))) < 60) {
 			return true;
 		}
 		return false;
+	}
+
+	public Map<String, Bot> renderMonster(TextureMapObjectRenderer tiledMapRenderer, String[] names) {
+		Map<String, Bot> mapBots = new HashMap<>();
+		for (int i = 0; i < names.length; i++) {
+			mapBots.put(names[i], new Bot(tiledMapRenderer, names[i]));
+			System.out.println(names[i]);
+		}
+		return mapBots;
 	}
 
 	@Override
 	public void dispose() {
 		tiledMap.dispose();
 		tiledMapRenderer.dispose();
-		knight.dispose();
+		player.dispose();
 	}
 
 	@Override
@@ -188,11 +204,8 @@ public class MapScreen implements Screen {
 		this.tiledMapRenderer = tiledMapRenderer;
 	}
 
-	public Knight getKnight() {
-		return knight;
+	public Person getPlayer() {
+		return player;
 	}
 
-	public void setKnight(Knight knight) {
-		this.knight = knight;
-	}
 }

@@ -1,4 +1,0 @@
-zrobić bazę danych,
-połączenia ze stroną,
-kolizja bohatera z drugą warstwą,
-

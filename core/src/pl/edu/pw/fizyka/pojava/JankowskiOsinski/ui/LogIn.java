@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.MapScreen;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Person;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Stats;
@@ -17,6 +15,7 @@ public class LogIn {
 	public static int attack = Stats.ATTACK_LEVEL_START;
 	public static int magic = Stats.MAGIC_LEVEL_START;
 	public static int exp = Stats.EXPERIENCE;
+	public static String role = "sorcerer";
 	private static int id;
 
 	public static boolean isLogin(String login, String password) {
@@ -37,12 +36,13 @@ public class LogIn {
 			ResultSet rs = prep.getResultSet();
 			isLog = rs.next();
 
-			// odczytac statystyki gracza
+			// players stats
 			id = rs.getInt("id");
 			gold = rs.getInt("gold");
 			attack = rs.getInt("skill");
 			magic = rs.getInt("magic");
 			exp = rs.getInt("exp");
+			role = rs.getString("role");
 			rs.close();
 			prep.close();
 			conn.close();
@@ -62,15 +62,14 @@ public class LogIn {
 			}
 			Connection conn = DriverManager.getConnection("jdbc:mysql://mn26.webd.pl/marekb93_rpggame",
 					"marekb93_rpggame", "xBGG)2Jn&b?E?kC+");
-			PreparedStatement prep = conn
-					.prepareStatement("UPDATE players SET gold = (?) , skill = (?), magic = (?), exp = (?) WHERE id = (?)");
+			PreparedStatement prep = conn.prepareStatement(
+					"UPDATE players SET gold = (?) , skill = (?), magic = (?), exp = (?) WHERE id = (?)");
 			prep.setLong(1, person.getGold());
 			prep.setLong(2, person.getAttackLevel());
 			prep.setLong(3, person.getMagicLevel());
 			prep.setLong(4, person.getExperience());
 			prep.setLong(5, LogIn.id);
 			prep.executeLargeUpdate();
-			System.out.println("elo elo 3 2 0");
 			prep.close();
 			conn.close();
 		} catch (SQLException e) {
@@ -79,11 +78,11 @@ public class LogIn {
 	}
 
 	public static void loadStatsFromServer(MapScreen mapScreen) {
-		// pobieranie z bazy danych statystyk gracza
-		mapScreen.getKnight().setAttackLevel(LogIn.attack);
-		mapScreen.getKnight().setGold(LogIn.gold);
-		mapScreen.getKnight().setMagicLevel(LogIn.magic);
-		mapScreen.getKnight().setExperience(LogIn.exp);
+		// loading players stats from database
+		mapScreen.getPlayer().setAttackLevel(LogIn.attack);
+		mapScreen.getPlayer().setGold(LogIn.gold);
+		mapScreen.getPlayer().setMagicLevel(LogIn.magic);
+		mapScreen.getPlayer().setExperience(LogIn.exp);
 	}
 
 }

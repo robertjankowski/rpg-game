@@ -9,10 +9,20 @@ if (! empty($_POST)) {
     $password = $_POST['password'];
     $repeat_password = $_POST['password2'];
     $role = $_POST['role'];
+    
     if($password == $repeat_password){
-    	$db->query("INSERT INTO players (login, password, role, gold, skill, magic, exp) VALUES ('" . $username . "', '" . $password . "', '" . $role . "', 100, 1, 1, 1)");
-    	echo "Account was created";
-    	$error = false;
+    	$sql = "SELECT * FROM players WHERE login = :username";
+    	$stmt = $db->prepare($sql);
+    	$stmt->bindValue(':username', $username);
+    	$stmt->execute();
+    	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+    	if($stmt->rowCount() == 0){
+	    	$db->query("INSERT INTO players (login, password, role, gold, skill, magic, exp) VALUES ('" . $username . "', '" . $password . "', '" . $role . "', 100, 1, 1, 1)");
+	    	echo "<script type='text/javascript'>alert('Account has been created')</script>";
+	    	$error = false;
+   		} else {
+   			echo "<script type='text/javascript'>alert('This login is already taken')</script>";
+   		}
     } else {
     	$error = true;
     	echo "<script>console.log( 'wrong password' );</script>";
@@ -31,6 +41,9 @@ if (! empty($_POST)) {
 		width: 70%;
 		border: 3px solid grey;
 		padding: 10px;
+	}
+	#message {
+		font-size: 30px;
 	}
 	</style>
 	<div class="container">
@@ -77,8 +90,8 @@ if (! empty($_POST)) {
 					class="form-check-label" for="exampleRadios2"> Sorcerer </label>
 			</div>
 	
-	
-			<button type="submit" value="Create account" class="btn btn-primary">Submit</button>
+			<div id="message"></div>
+			<button type="submit" value="Create account" class="btn btn-primary" onclick="">Submit</button>
 		</form>
 	</div>
 <?php

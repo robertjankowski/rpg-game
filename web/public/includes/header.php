@@ -11,6 +11,7 @@ $user = $_SESSION['user'];
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <script type="text/javascript" src="script.js"></script>
 
     <title>Java Projekt RPG game</title>
 

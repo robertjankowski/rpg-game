@@ -5,9 +5,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 
 public class MyMusic {
-	// "caravan.ogg.ogg" - pustynia
-	// "music.mp3" - las
-	// "footstep.ogg" - chodzenie
+	// "caravan.ogg.ogg" - desert
+	// "music.mp3" - forrest
+	// "footstep.ogg" - walking
 	FileHandle fileMusic;
 	Music music;
 

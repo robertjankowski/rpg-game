@@ -1,8 +1,5 @@
 package pl.edu.pw.fizyka.pojava.JankowskiOsinski.people;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -12,39 +9,49 @@ import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.TextureMapObjectRenderer;
 
 public class Bot {
 
-	public static final String toFilePath = "bot.png";
-
 	TextureMapObjectRenderer tiledMapRenderer;
 	MapLayer monsterLayer;
 	MapObjects monsterObjects;
-	List<MapObject> monsterList;
+	MapObject monster;
+	private int hp = 10;
+	private int shielding = 1;
 
-	public Bot(TextureMapObjectRenderer tiledMapRenderer) {
+	public Bot(TextureMapObjectRenderer tiledMapRenderer, String name) {
 		this.tiledMapRenderer = tiledMapRenderer;
 		try {
 			monsterLayer = tiledMapRenderer.getMap().getLayers().get("monster");
 			monsterObjects = monsterLayer.getObjects();
-			monsterList = new ArrayList<>();
-			monsterList.add(monsterObjects.get("dragon"));
-			monsterList.add(monsterObjects.get("goblin"));
-			monsterList.add(monsterObjects.get("demon"));
+			monster = monsterObjects.get(name);
 		} catch (Exception ex) {
 		}
 	}
 
 	public void update(float delta) {
-		for (MapObject mapObject : monsterList) {
-			tiledMapRenderer.renderObject(mapObject);
-		}
+		tiledMapRenderer.renderMonster(monster);
 	}
 
-	// getting position of the monster
-	public Vector2 position(int which) {
-		return new Vector2((float) monsterList.get(which).getProperties().get("xPos"),
-				(float) monsterList.get(which).getProperties().get("yPos"));
+	// getting position of the monster ??? wrong way
+	public Vector2 position() {
+		float x = (float) monster.getProperties().get("x");
+		float y = (float) monster.getProperties().get("y");
+		System.out.println(x + " , " + y);
+		return new Vector2();
 	}
 
-	public List<MapObject> getMonsterList() {
-		return monsterList;
+	public int getHp() {
+		return hp;
 	}
+
+	public void setHp(int hp) {
+		this.hp = hp;
+	}
+
+	public int getShielding() {
+		return shielding;
+	}
+
+	public void setShielding(int shielding) {
+		this.shielding = shielding;
+	}
+
 }

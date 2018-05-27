@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -61,14 +60,14 @@ public class Shop implements Screen {
 		hpButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (mapScreen.getKnight().getGold() >= Constants.HP_COST) {
-					mapScreen.getKnight().setGold(mapScreen.getKnight().getGold() - Constants.HP_COST);
-					if (mapScreen.getKnight().getHp() < 100) {
-						mapScreen.getKnight()
-								.setHp(mapScreen.getKnight().getHp() + ThreadLocalRandom.current().nextInt(20, 30));
+				if (mapScreen.getPlayer().getGold() >= Constants.HP_COST) {
+					mapScreen.getPlayer().setGold(mapScreen.getPlayer().getGold() - Constants.HP_COST);
+					if (mapScreen.getPlayer().getHp() < 100) {
+						mapScreen.getPlayer()
+								.setHp(mapScreen.getPlayer().getHp() + ThreadLocalRandom.current().nextInt(20, 30));
 					}
-					if (mapScreen.getKnight().getHp() > 100) {
-						mapScreen.getKnight().setHp(Stats.HP_START);
+					if (mapScreen.getPlayer().getHp() > 100) {
+						mapScreen.getPlayer().setHp(Stats.HP_START);
 					}
 				} else {
 					notEnoughMoney();
@@ -78,14 +77,14 @@ public class Shop implements Screen {
 		manaButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (mapScreen.getKnight().getGold() >= Constants.HP_COST) {
-					mapScreen.getKnight().setGold(mapScreen.getKnight().getGold() - Constants.HP_COST);
-					if (mapScreen.getKnight().getMana() < 100) {
-						mapScreen.getKnight()
-								.setMana(mapScreen.getKnight().getMana() + ThreadLocalRandom.current().nextInt(20, 30));
+				if (mapScreen.getPlayer().getGold() >= Constants.HP_COST) {
+					mapScreen.getPlayer().setGold(mapScreen.getPlayer().getGold() - Constants.HP_COST);
+					if (mapScreen.getPlayer().getMana() < 100) {
+						mapScreen.getPlayer()
+								.setMana(mapScreen.getPlayer().getMana() + ThreadLocalRandom.current().nextInt(20, 30));
 					}
-					if (mapScreen.getKnight().getMana() > 100) {
-						mapScreen.getKnight().setMana(Stats.HP_START);
+					if (mapScreen.getPlayer().getMana() > 100) {
+						mapScreen.getPlayer().setMana(Stats.HP_START);
 					}
 				} else {
 					notEnoughMoney();
@@ -95,12 +94,13 @@ public class Shop implements Screen {
 		skillButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (mapScreen.getKnight().getGold() >= Constants.HP_COST) {
-					mapScreen.getKnight().setGold(mapScreen.getKnight().getGold() - Constants.HP_COST);
+				// change HP_COST to SKILL_COST
+				if (mapScreen.getPlayer().getGold() >= Constants.HP_COST) {
+					mapScreen.getPlayer().setGold(mapScreen.getPlayer().getGold() - Constants.HP_COST);
 					if (ThreadLocalRandom.current().nextInt(0, 2) == 1) {
-						mapScreen.getKnight().setAttackLevel(mapScreen.getKnight().getAttackLevel() + 1);
+						mapScreen.getPlayer().setAttackLevel(mapScreen.getPlayer().getAttackLevel() + 1);
 					} else {
-						mapScreen.getKnight().setMagicLevel(mapScreen.getKnight().getMagicLevel() + 1);
+						mapScreen.getPlayer().setMagicLevel(mapScreen.getPlayer().getMagicLevel() + 1);
 					}
 				} else {
 					notEnoughMoney();

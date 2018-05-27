@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.MyMusic;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.MapScreen;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.ui.LogIn;
 
@@ -49,7 +50,7 @@ public abstract class Person implements Stats {
 		this.setExperience(experience);
 	}
 
-	public void update(float delta) {
+	public void update(float delta, MapScreen mapScreen) {
 		spriteBatch.begin();
 		spriteBatch.draw(texture, position.x, position.y);
 		spriteBatch.end();
@@ -125,5 +126,9 @@ public abstract class Person implements Stats {
 
 	public void setGold(int gold) {
 		this.gold = gold;
+	}
+
+	public MyMusic getWalkMusic() {
+		return null;
 	}
 }

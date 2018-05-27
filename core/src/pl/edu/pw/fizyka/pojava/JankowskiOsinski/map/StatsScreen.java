@@ -5,17 +5,12 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -48,14 +43,14 @@ public class StatsScreen implements Screen {
 		assetManager.load("uiskin.json", Skin.class);
 		assetManager.finishLoading();
 		statsLabel = new Label("--Statistics--", assetManager.get(Constants.SKIN_NAME, Skin.class));
-		expLabel = new Label("EXPERIENCE: " + mapScreen.getKnight().getExperience(),
+		expLabel = new Label("EXPERIENCE: " + mapScreen.getPlayer().getExperience(),
 				assetManager.get(Constants.SKIN_NAME, Skin.class));
-		hpLabel = new Label("HP: " + mapScreen.getKnight().getHp(), assetManager.get(Constants.SKIN_NAME, Skin.class));
-		goldLabel = new Label("GOLD: " + mapScreen.getKnight().getGold(), assetManager.get(Constants.SKIN_NAME, Skin.class));
-		manaLabel = new Label("MANA: " + mapScreen.getKnight().getMana(), assetManager.get(Constants.SKIN_NAME, Skin.class));
-		attackLabel = new Label("ATTACK LEVEL: " + mapScreen.getKnight().getAttackLevel(),
+		hpLabel = new Label("HP: " + mapScreen.getPlayer().getHp(), assetManager.get(Constants.SKIN_NAME, Skin.class));
+		goldLabel = new Label("GOLD: " + mapScreen.getPlayer().getGold(), assetManager.get(Constants.SKIN_NAME, Skin.class));
+		manaLabel = new Label("MANA: " + mapScreen.getPlayer().getMana(), assetManager.get(Constants.SKIN_NAME, Skin.class));
+		attackLabel = new Label("ATTACK LEVEL: " + mapScreen.getPlayer().getAttackLevel(),
 				assetManager.get(Constants.SKIN_NAME, Skin.class));
-		magicLabel = new Label("MAGIC LEVEL: " + mapScreen.getKnight().getMagicLevel(),
+		magicLabel = new Label("MAGIC LEVEL: " + mapScreen.getPlayer().getMagicLevel(),
 				assetManager.get(Constants.SKIN_NAME, Skin.class));
 		stage = new Stage(new ScreenViewport());
 		table = new Table();

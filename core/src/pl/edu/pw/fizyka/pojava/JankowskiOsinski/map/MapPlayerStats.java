@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.Constants;
-import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Knight;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.PersonTemplate;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.ui.LogIn;
 
 public class MapPlayerStats {
@@ -42,7 +42,7 @@ public class MapPlayerStats {
 					protected void result(Object object) {
 						if (object.equals(true)) {
 							try {
-								LogIn.savePlayer(mapScreen.getKnight());
+								LogIn.savePlayer(mapScreen.getPlayer());
 								System.exit(0);
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -67,10 +67,10 @@ public class MapPlayerStats {
 		Gdx.input.setInputProcessor(stage);
 	}
 
-	public void show(Knight knight) {
-		statsHP = "HP : " + knight.getHp();
-		statsGOLD = "    GOLD : " + knight.getGold();
-		statsEXP = "    EXP : " + knight.getExperience();
+	public void show(PersonTemplate person) {
+		statsHP = "HP : " + person.getHp();
+		statsGOLD = "    GOLD : " + person.getGold();
+		statsEXP = "    EXP : " + person.getExperience();
 		statsLabel.setText(statsHP + statsGOLD + statsEXP);
 	}
 

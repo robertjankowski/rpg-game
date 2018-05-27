@@ -10,6 +10,11 @@ public final class Constants {
 
 	public static final String SKIN_NAME = "uiskin.json";
 
+	public static final String KNIGHT_IMG = "person2.png";
+	public static final String WIZARD_IMG = "person3.png";
+
+	public static final String[] BOTS_NAMES = { "goblin", "goblin1", "dragon", "dragon1", "demon" };
+
 	public static final float ZOOM = 0.45f;
 	public static final float ZOOM_RATE = 0.8f;
 
@@ -17,8 +22,8 @@ public final class Constants {
 	public static final int startPositionY = 1679;
 
 	// only for tests
-	public static final float endPositionX = 1000;
-	public static final float endPositionY = 1000;
+	public static final float endPositionX = 673;
+	public static final float endPositionY = 1139;
 
 	// music
 	public static final String FORREST_MUSIC = "music.mp3";
@@ -28,11 +33,15 @@ public final class Constants {
 
 	public static float MAP_HEIGHT;
 	public static float MAP_WIDTH;
-	public static float TILE_SIZE;
+	public static int TILE_SIZE = 24;
 
 	public static final int MAP_SCREEN = 1;
 	public static final int STATS_SCREEN = 2;
 	public static final int SHOP_SCREEN = 3;
 
 	public static final int HP_COST = 10;
+	public static final int SKILL_COST = 50;
+
+	public static final int KNIGHT_RANGE = 100;
+	public static final int WIZARD_RANGE = 300;
 }
