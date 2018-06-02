@@ -7,13 +7,16 @@ import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.Constants;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.screens.Shop;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.screens.StatsScreen;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Wizard;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.utils.UniqueList;
 
@@ -27,13 +30,13 @@ public class ScreenSwitcher extends InputAdapter {
 	Vector2 posCamera;
 	Vector2 posPlayer;
 	List<Vector2> posOfMonsters = new ArrayList<>();
+	public static boolean isClicked = false;
 
 	public ScreenSwitcher(Game game, MapScreen screenMap, StatsScreen statsScreen, Shop shop) {
 		this.game = game;
 		this.mapScreen = screenMap;
 		this.statsScreen = statsScreen;
 		this.shop = shop;
-
 	}
 
 	// Use 'I' to change screens
@@ -62,21 +65,29 @@ public class ScreenSwitcher extends InputAdapter {
 				currentScreen = Constants.MAP_SCREEN;
 			}
 		}
+		// show range circle
+		if (keycode == Keys.R) {
+			if (!Constants.isCircle) {
+				Constants.isCircle = true;
+			}
+			// System.out.println(Constants.isCircle);
+		}
 		return true;
 	}
 
-	// check if player clicked monster
+	// check if player clicked the monster
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		try {
+			isClicked = true;
 
 			if (currentScreen == Constants.MAP_SCREEN) {
-				for (int i = 0; i < mapScreen.mapBots.size(); i++) {
-					posOfMonsters.add(new Vector2(mapScreen.tiledMapRenderer.uniqueMonster.get(i).getX(),
-							mapScreen.tiledMapRenderer.uniqueMonster.get(i).getY()));
-				}
 
+				addMonstersByPosition(mapScreen, posOfMonsters);
 				// mapScreen.mapBots.forEach((k, v) -> System.out.println(k));
+
+				// translate touch coords to map coords
+				Vector2 cameraCoords = new Vector2(screenX, Gdx.graphics.getHeight() - 1 - screenY);
 
 				// get player coords
 				int playerX = (int) mapScreen.player.getPosition().x;
@@ -91,7 +102,9 @@ public class ScreenSwitcher extends InputAdapter {
 				// change range based on the class
 				Object[] results = isMonsterClicked(screenX, screenY, posOfMonsters, playerX, playerY,
 						(mapScreen.player instanceof Wizard) ? Constants.WIZARD_RANGE : Constants.KNIGHT_RANGE,
-						mapScreen.tiledMapRenderer.uniqueMonster);
+						mapScreen.tiledMapRenderer.getUniqueMonster());
+
+				Constants.monsterCurrentAttack = (int) results[2];
 
 				posOfMonsters.clear();
 
@@ -105,7 +118,7 @@ public class ScreenSwitcher extends InputAdapter {
 						mapScreen.player.setExperience(mapScreen.player.getExperience()
 								+ mapScreen.mapBots.get((String) results[1]).getShielding());
 						mapScreen.mapBots.remove((String) results[1]);
-						mapScreen.tiledMapRenderer.uniqueMonster.remove((int) results[2]);
+						mapScreen.tiledMapRenderer.getUniqueMonster().remove((int) results[2]);
 						mapScreen.mapPlayerStats.show(mapScreen.player);
 					} else {
 
@@ -113,29 +126,34 @@ public class ScreenSwitcher extends InputAdapter {
 
 						mapScreen.mapBots.get((String) results[1]).setHp(hpBot - damage);
 
-						// add hud to bot
-
-						// DamageScreen damageScreen = new DamageScreen(new Vector2(screenX, screenY),
-						// damage);
-						// damageScreen.render();
-
+						// if clicked bot show -hp above head
+						if (button == Input.Buttons.LEFT) {
+							Constants.isClickedMonster = true;
+							mapScreen.damageScreen.showHp(hpBot, cameraCoords);
+						}
 						// System.out.println(damage);
 						// System.out.println((String) results[1]);
 					}
 					if (mapScreen.mapBots.size() <= 0) {
 						restartMonsters(mapScreen);
+						mapScreen.mapBots.forEach((k, v) -> v.increaseStatsAfterDead(30, 5, 2));
 					}
 				}
 				System.out
 						.println("Screen coord translated to world coordinates: " + "X: " + screenX + " Y: " + screenY);
-				// System.err.println("Size unique : " + mapScreen.tiledMapRenderer.uniqueMonster.size());
 			}
 		} catch (Exception e) {
 			System.out.println("There are't any bots on this map");
-			// remember that there is null pointer exception but it works
 			// e.printStackTrace();
 		}
 		return false;
+	}
+
+	public void addMonstersByPosition(MapScreen mapScreen, List<Vector2> posOfMonsters) {
+		for (int i = 0; i < mapScreen.mapBots.size(); i++) {
+			posOfMonsters.add(new Vector2(mapScreen.tiledMapRenderer.getUniqueMonster().get(i).getX(),
+					mapScreen.tiledMapRenderer.getUniqueMonster().get(i).getY()));
+		}
 	}
 
 	/**
@@ -153,7 +171,7 @@ public class ScreenSwitcher extends InputAdapter {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				mapScreen.tiledMapRenderer.setRandomPositionMonsters(mapScreen.tiledMapRenderer.uniqueMonster);
+				mapScreen.tiledMapRenderer.setRandomPositionMonsters(mapScreen.tiledMapRenderer.getUniqueMonster());
 			}
 		}, 5100);
 	}
@@ -167,7 +185,8 @@ public class ScreenSwitcher extends InputAdapter {
 	 * @param playerY
 	 * @param radius
 	 * @param monster
-	 * @return { (boolean) if player cliked monster, name of monster }
+	 * @return { (boolean) if player clicked monster, name of monster, index of the
+	 *         monster }
 	 */
 	private Object[] isMonsterClicked(int clickX, int clickY, List<Vector2> monstersPos, int playerX, int playerY,
 			int radius, UniqueList<TextureMapObject> monster) {
@@ -202,4 +221,7 @@ public class ScreenSwitcher extends InputAdapter {
 		return false;
 	}
 
+	public List<Vector2> getPosOfMonsters() {
+		return posOfMonsters;
+	}
 }

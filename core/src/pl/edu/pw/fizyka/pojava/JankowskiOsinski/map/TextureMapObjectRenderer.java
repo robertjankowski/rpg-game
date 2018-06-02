@@ -1,5 +1,6 @@
 package pl.edu.pw.fizyka.pojava.JankowskiOsinski.map;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,6 +11,8 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Bot;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.PersonTemplate;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.utils.UniqueList;
 
 /**
@@ -18,7 +21,8 @@ import pl.edu.pw.fizyka.pojava.JankowskiOsinski.utils.UniqueList;
 public class TextureMapObjectRenderer extends OrthogonalTiledMapRenderer {
 
 	// not duplicated list of objects to get X,Y position
-	UniqueList<TextureMapObject> uniqueMonster = new UniqueList<>();
+	private UniqueList<TextureMapObject> uniqueMonster = new UniqueList<>();
+	int counter = 0;
 
 	public TextureMapObjectRenderer(TiledMap map) {
 		super(map);
@@ -50,13 +54,10 @@ public class TextureMapObjectRenderer extends OrthogonalTiledMapRenderer {
 	public void renderMonster(MapObject object) {
 		if (object instanceof TextureMapObject) {
 			TextureMapObject textureMonster = (TextureMapObject) object;
-			uniqueMonster.add(textureMonster);
+			getUniqueMonster().add(textureMonster);
 			batch.begin();
 			batch.draw(textureMonster.getTextureRegion(), textureMonster.getX(), textureMonster.getY());
 			batch.end();
-			// move the monster
-			textureMonster.setX(randomMove(-3, 3).x + textureMonster.getX());
-			textureMonster.setY(randomMove(-3, 3).y + textureMonster.getY());
 			// System.out.println(uniqueMonster.size());
 		}
 	}
@@ -74,6 +75,29 @@ public class TextureMapObjectRenderer extends OrthogonalTiledMapRenderer {
 			e.setX(ThreadLocalRandom.current().nextInt(300, 1700));
 			e.setY(ThreadLocalRandom.current().nextInt(300, 1700));
 		});
+	}
+
+	public void followPlayer(UniqueList<TextureMapObject> uniqueMonster, int monsterIndex, PersonTemplate player) {
+		if (uniqueMonster.indexExist(monsterIndex)) {
+			float diffX = player.getPosition().x - uniqueMonster.get(monsterIndex).getX();
+			float diffY = player.getPosition().y - uniqueMonster.get(monsterIndex).getY();
+
+			float angle = (float) Math.atan2(diffY, diffX);
+			float speed = 0.6f;
+			uniqueMonster.get(monsterIndex)
+					.setX((float) (uniqueMonster.get(monsterIndex).getX() + speed * Math.cos(angle)));
+			uniqueMonster.get(monsterIndex)
+					.setY((float) (uniqueMonster.get(monsterIndex).getY() + speed * Math.sin(angle)));
+
+		}
+	}
+
+	public UniqueList<TextureMapObject> getUniqueMonster() {
+		return uniqueMonster;
+	}
+
+	public void setUniqueMonster(UniqueList<TextureMapObject> uniqueMonster) {
+		this.uniqueMonster = uniqueMonster;
 	}
 
 }

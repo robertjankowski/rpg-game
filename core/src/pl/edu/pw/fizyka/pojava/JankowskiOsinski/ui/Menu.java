@@ -27,7 +27,9 @@ public class Menu implements Screen {
 	private Table table;
 	private TextButton startButton;
 	private TextButton loadButton;
+	private TextButton helpButton;
 	private TextButton quitButton;
+
 	private TextArea textArea;
 
 	// to background image
@@ -37,10 +39,12 @@ public class Menu implements Screen {
 	private AssetManager assetManager;
 	private RPGgame game;
 	private LogMenu logMenu;
+	private HelpMenu helpMenu;
 
 	public Menu(RPGgame game) {
 		this.game = game;
 		logMenu = new LogMenu(game, this);
+		helpMenu = new HelpMenu(game, this);
 	}
 
 	@Override
@@ -50,9 +54,11 @@ public class Menu implements Screen {
 		assetManager.finishLoading();
 		startButton = new TextButton("New game", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		loadButton = new TextButton("Load game", assetManager.get(Constants.SKIN_NAME, Skin.class));
+		helpButton = new TextButton("Help", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		quitButton = new TextButton("Exit", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		startButton.setColor(Color.YELLOW);
 		loadButton.setColor(Color.RED);
+		helpButton.setColor(Color.FOREST);
 		quitButton.setColor(Color.BLUE);
 		startButton.addListener(new ClickListener() {
 			@Override
@@ -64,6 +70,12 @@ public class Menu implements Screen {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				game.setScreen(logMenu);
+			}
+		});
+		helpButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(helpMenu);
 			}
 		});
 		quitButton.addListener(new ClickListener() {
@@ -82,6 +94,8 @@ public class Menu implements Screen {
 		table.add(startButton).padBottom(50);
 		table.row();
 		table.add(loadButton).padBottom(50);
+		table.row();
+		table.add(helpButton).padBottom(50);
 		table.row();
 		table.add(quitButton);
 		table.row();

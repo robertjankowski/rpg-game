@@ -58,6 +58,10 @@ public class UniqueList<T> {
 		return false;
 	}
 
+	public boolean indexExist(int index) {
+		return index >= 0 && index < innerList.size();
+	}
+
 	public Stream<T> stream() {
 		return innerList.stream();
 	}
