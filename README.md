@@ -7,6 +7,7 @@ University project. Game written in LibGDX framework with @paawelosinski
 * in IDE import existing Gradle project
   * use terminal `./gradlew desktop:run`
   * run DesktopLauncher as Java Application
+* make sure you have Java 8 installed.
 
 
 ## Our page 
