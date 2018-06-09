@@ -1,6 +1,5 @@
 package pl.edu.pw.fizyka.pojava.JankowskiOsinski.map;
 
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -11,7 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.Bot;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.Constants;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.people.PersonTemplate;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.utils.UniqueList;
 
@@ -77,18 +76,27 @@ public class TextureMapObjectRenderer extends OrthogonalTiledMapRenderer {
 		});
 	}
 
-	public void followPlayer(UniqueList<TextureMapObject> uniqueMonster, int monsterIndex, PersonTemplate player) {
-		if (uniqueMonster.indexExist(monsterIndex)) {
-			float diffX = player.getPosition().x - uniqueMonster.get(monsterIndex).getX();
-			float diffY = player.getPosition().y - uniqueMonster.get(monsterIndex).getY();
+	public void followPlayerAlways(UniqueList<TextureMapObject> uniqueMonster, PersonTemplate player) {
+		for (int i = 0; i < uniqueMonster.size(); i++) {
+			float distance = (float) Math.sqrt(Math.pow(player.getPosition().x - uniqueMonster.get(i).getX(), 2)
+					+ Math.pow(player.getPosition().y - uniqueMonster.get(i).getY(), 2));
+			if (distance <= Constants.MONSTER_RANGE_FOLLOW) {
+				Random random = new Random();
+				float diffX = 0;
+				float diffY = 0;
+				if (random.nextInt(100) % 2 == 0) {
+					diffX = player.getPosition().x - uniqueMonster.get(i).getX() + 20;
+					diffY = player.getPosition().y - uniqueMonster.get(i).getY() + 20;
+				} else {
+					diffX = player.getPosition().x - uniqueMonster.get(i).getX() - 20;
+					diffY = player.getPosition().y - uniqueMonster.get(i).getY() - 20;
+				}
+				float angle = (float) Math.atan2(diffY, diffX);
+				float speed = 0.6f;
 
-			float angle = (float) Math.atan2(diffY, diffX);
-			float speed = 0.6f;
-			uniqueMonster.get(monsterIndex)
-					.setX((float) (uniqueMonster.get(monsterIndex).getX() + speed * Math.cos(angle)));
-			uniqueMonster.get(monsterIndex)
-					.setY((float) (uniqueMonster.get(monsterIndex).getY() + speed * Math.sin(angle)));
-
+				uniqueMonster.get(i).setX((float) (uniqueMonster.get(i).getX() + speed * Math.cos(angle)));
+				uniqueMonster.get(i).setY((float) (uniqueMonster.get(i).getY() + speed * Math.sin(angle)));
+			}
 		}
 	}
 

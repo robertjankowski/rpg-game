@@ -44,10 +44,12 @@ public class HelpMenu implements Screen {
 		table = new Table();
 		infoLabel = new Label("Keyboard shortcuts", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		attackInfo = new Label("Attack monster by clicking it", assetManager.get(Constants.SKIN_NAME, Skin.class));
-		screenInfo = new Label[3];
+		screenInfo = new Label[4];
 		screenInfo[0] = new Label("'Space' --- shop", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		screenInfo[1] = new Label("  'I'   --- stats", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		screenInfo[2] = new Label("  'R'   --- attack range", assetManager.get(Constants.SKIN_NAME, Skin.class));
+		screenInfo[3] = new Label("  'Q'   --- spell (only for Wizard)",
+				assetManager.get(Constants.SKIN_NAME, Skin.class));
 
 		returnButton = new TextButton("Back to menu", assetManager.get(Constants.SKIN_NAME, Skin.class));
 		returnButton.addListener(new ClickListener() {

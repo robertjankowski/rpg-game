@@ -22,6 +22,7 @@ public class MapPlayerStats {
 	Label statsLabel;
 	AssetManager assetManager;
 	String statsHP;
+	String statsMANA;
 	String statsGOLD;
 	String statsEXP;
 	TextButton returnButton;
@@ -70,9 +71,10 @@ public class MapPlayerStats {
 
 	public void show(PersonTemplate person) {
 		statsHP = "HP : " + person.getHp();
+		statsMANA = "    MANA : " + person.getMana();
 		statsGOLD = "    GOLD : " + person.getGold();
 		statsEXP = "    EXP : " + person.getExperience();
-		statsLabel.setText(statsHP + statsGOLD + statsEXP);
+		statsLabel.setText(statsHP + statsMANA + statsGOLD + statsEXP);
 	}
 
 	public void render() {

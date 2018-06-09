@@ -29,6 +29,7 @@ public final class Constants {
 	public static final String WALK_MUSIC = "footstep.ogg";
 	public static final float WALK_MUSIC_VOLUME = 0.1f;
 	public static final String WIZZARD_ATTACK_MUSIC = "wizard_sound_attack.mp3";
+	public static final String WIZZARD_ATTACK_SPELL_MUSIC = "acid burn.mp3";
 	public static final String KNIGHT_ATTACK_MUSIC = "knight_sound_attack.mp3";
 
 	public static float MAP_HEIGHT;
@@ -44,9 +45,14 @@ public final class Constants {
 
 	public static final int KNIGHT_RANGE = 110;
 	public static final int WIZARD_RANGE = 200;
-	public static final int MONSTER_RANGE = 110;
+	public static final int WIZARD_SPELL_RANGE = 150;
+	public static final int MONSTER_RANGE_ATTACK = 110;
+	public static final int MONSTER_RANGE_FOLLOW = 300;
+
+	public static final int SPELL_COST = 20;
 
 	public static boolean isClickedMonster = false;
+	public static boolean isWizardSpell = false;
 	public static boolean isCircle = false;
 
 	public static int monsterCurrentAttack = -999;

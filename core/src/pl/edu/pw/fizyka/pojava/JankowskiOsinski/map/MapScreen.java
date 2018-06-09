@@ -42,6 +42,7 @@ public class MapScreen implements Screen {
 	TextureMapObjectRenderer tiledMapRenderer;
 	MyMusic music;
 	MyMusic attackMusic;
+	MyMusic spellAttackMusic;
 	public MapPlayerStats mapPlayerStats;
 	DamageScreen damageScreen;
 	ShowRangeScreenStage rangeScreenStage;
@@ -62,6 +63,7 @@ public class MapScreen implements Screen {
 	private int counter = 0;
 	private int rangeCounter = 0;
 	private int musicCounter = 0;
+	private int musicSpellCounter = 0;
 
 	public MapScreen(RPGgame game) {
 		this.game = game;
@@ -115,6 +117,10 @@ public class MapScreen implements Screen {
 				: Constants.KNIGHT_ATTACK_MUSIC);
 		attackMusic.setLevel(0.7f);
 
+		// spell attack musi
+		spellAttackMusic = new MyMusic(Constants.WIZZARD_ATTACK_SPELL_MUSIC);
+		spellAttackMusic.setLevel(0.8f);
+
 		// System.out.println(player.getClass().getSimpleName());
 		mapBots = renderMonster(tiledMapRenderer, Constants.BOTS_NAMES);
 		bot = new Bot(tiledMapRenderer, Constants.BOTS_NAMES[0]);
@@ -155,6 +161,7 @@ public class MapScreen implements Screen {
 							player.getMagicLevel(), player.getExperience() };
 					player.getWalkMusic().stopPlay();
 					attackMusic.stopPlay();
+					spellAttackMusic.stopPlay();
 					init(Constants.endPositionX, Constants.endPositionY, Constants.newMap, Constants.DESSERT_MUSIC);
 					player.saveStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]);
 					isZooming = true;
@@ -177,7 +184,7 @@ public class MapScreen implements Screen {
 		// attack player !
 		addMonstersToList(tiledMapRenderer, posOfMonsters);
 		if (isPlayerNearMonster(posOfMonsters, (int) player.getPosition().x, (int) player.getPosition().y,
-				Constants.MONSTER_RANGE)) {
+				Constants.MONSTER_RANGE_ATTACK)) {
 			++counter;
 			// decrease value to increase speed
 			if (counter == 10) {
@@ -193,6 +200,7 @@ public class MapScreen implements Screen {
 			music.stopPlay();
 			player.getWalkMusic().stopPlay();
 			attackMusic.stopPlay();
+			spellAttackMusic.stopPlay();
 			int expAfterDead = (int) Math.floor(player.getExperience() / 2);
 			System.out.println(expAfterDead);
 			int[] stats = { Stats.HP_START, player.getMana(), player.getGold(), player.getAttackLevel(),
@@ -211,6 +219,16 @@ public class MapScreen implements Screen {
 				Constants.isClickedMonster = false;
 				attackMusic.stopPlay();
 				musicCounter = 0;
+			}
+		}
+		// loop spell attack music
+		if (Constants.isWizardSpell) {
+			++musicSpellCounter;
+			spellAttackMusic.startPlay();
+			if (musicSpellCounter == 50) {
+				Constants.isWizardSpell = false;
+				spellAttackMusic.stopPlay();
+				musicSpellCounter = 0;
 			}
 		}
 	}
@@ -260,6 +278,7 @@ public class MapScreen implements Screen {
 		for (Vector2 monster : monstersPos) {
 			int range = (int) Math.sqrt(Math.pow((monster.x - playerX), 2) + Math.pow((monster.y - playerY), 2));
 			if (range <= radius) {
+
 				return true;
 			}
 		}

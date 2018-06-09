@@ -70,8 +70,44 @@ public class ScreenSwitcher extends InputAdapter {
 			if (!Constants.isCircle) {
 				Constants.isCircle = true;
 			}
-			// System.out.println(Constants.isCircle);
 		}
+		// add spell for wizard, territorial attack
+		if (keycode == Keys.Q) {
+			if (mapScreen.getPlayer().getMana() >= Constants.SPELL_COST
+					&& mapScreen.getPlayer().getClass().getSimpleName().equals("Wizard")) {
+				String[] namesOfMonstersInRange = isMonsterInSpellRange(mapScreen.getPlayer().getPosition().x,
+						mapScreen.getPlayer().getPosition().y, mapScreen.tiledMapRenderer.getUniqueMonster(),
+						Constants.WIZARD_SPELL_RANGE);
+				if (mapScreen.mapBots.size() <= 0) {
+					restartMonsters(mapScreen);
+					mapScreen.mapBots.forEach((k, v) -> v.increaseStatsAfterDead(30, 5, 2));
+					if (mapScreen.getPlayer().getClass().getSimpleName().equals("Wizard")) {
+						mapScreen.getPlayer().setMana(mapScreen.getPlayer().getMana() + 30);
+					}
+				}
+				for (int i = 0; i < namesOfMonstersInRange.length; i++) {
+					if (mapScreen.mapBots.containsKey(namesOfMonstersInRange[i])) {
+						int hpBot = mapScreen.mapBots.get(namesOfMonstersInRange[i]).getHp();
+						if (hpBot <= 0) {
+							mapScreen.player
+									.setGold(mapScreen.player.getGold() + ThreadLocalRandom.current().nextInt(0, 30));
+							mapScreen.player.setExperience(mapScreen.player.getExperience()
+									+ mapScreen.mapBots.get(namesOfMonstersInRange[i]).getShielding());
+							mapScreen.mapBots.remove(namesOfMonstersInRange[i]);
+							mapScreen.tiledMapRenderer.getUniqueMonster().remove(i);
+							mapScreen.mapPlayerStats.show(mapScreen.player);
+						} else {
+							int damage = mapScreen.player.attack(mapScreen.mapBots.get(namesOfMonstersInRange[i]));
+							mapScreen.mapBots.get(namesOfMonstersInRange[i]).setHp(hpBot - damage);
+							mapScreen.getPlayer().setMana(mapScreen.getPlayer().getMana() - Constants.SPELL_COST);
+							Constants.isWizardSpell = true;
+						}
+					}
+				}
+
+			}
+		}
+
 		return true;
 	}
 
@@ -109,34 +145,44 @@ public class ScreenSwitcher extends InputAdapter {
 				posOfMonsters.clear();
 
 				if ((boolean) results[0]) {
+					if (mapScreen.getPlayer().getMana() >= 5) {
 
-					int hpBot = mapScreen.mapBots.get((String) results[1]).getHp();
-
-					if (hpBot <= 0) {
-						mapScreen.player
-								.setGold(mapScreen.player.getGold() + ThreadLocalRandom.current().nextInt(0, 30));
-						mapScreen.player.setExperience(mapScreen.player.getExperience()
-								+ mapScreen.mapBots.get((String) results[1]).getShielding());
-						mapScreen.mapBots.remove((String) results[1]);
-						mapScreen.tiledMapRenderer.getUniqueMonster().remove((int) results[2]);
-						mapScreen.mapPlayerStats.show(mapScreen.player);
-					} else {
-
-						int damage = mapScreen.player.attack(mapScreen.mapBots.get((String) results[1]));
-
-						mapScreen.mapBots.get((String) results[1]).setHp(hpBot - damage);
-
-						// if clicked bot show -hp above head
-						if (button == Input.Buttons.LEFT) {
-							Constants.isClickedMonster = true;
-							mapScreen.damageScreen.showHp(hpBot, cameraCoords);
+						// decrease mana when wizard attack
+						if (mapScreen.getPlayer().getClass().getSimpleName().equals("Wizard")) {
+							mapScreen.getPlayer().setMana(mapScreen.getPlayer().getMana() - 5);
 						}
-						// System.out.println(damage);
-						// System.out.println((String) results[1]);
-					}
-					if (mapScreen.mapBots.size() <= 0) {
-						restartMonsters(mapScreen);
-						mapScreen.mapBots.forEach((k, v) -> v.increaseStatsAfterDead(30, 5, 2));
+						int hpBot = mapScreen.mapBots.get((String) results[1]).getHp();
+
+						if (hpBot <= 0) {
+							mapScreen.player
+									.setGold(mapScreen.player.getGold() + ThreadLocalRandom.current().nextInt(0, 30));
+							mapScreen.player.setExperience(mapScreen.player.getExperience()
+									+ mapScreen.mapBots.get((String) results[1]).getShielding());
+							mapScreen.mapBots.remove((String) results[1]);
+							mapScreen.tiledMapRenderer.getUniqueMonster().remove((int) results[2]);
+							mapScreen.mapPlayerStats.show(mapScreen.player);
+
+						} else {
+
+							int damage = mapScreen.player.attack(mapScreen.mapBots.get((String) results[1]));
+
+							mapScreen.mapBots.get((String) results[1]).setHp(hpBot - damage);
+
+							// if clicked bot show -hp above head
+							if (button == Input.Buttons.LEFT) {
+								Constants.isClickedMonster = true;
+								mapScreen.damageScreen.showHp(hpBot, cameraCoords);
+							}
+							// System.out.println(damage);
+							// System.out.println((String) results[1]);
+						}
+						if (mapScreen.mapBots.size() <= 0) {
+							restartMonsters(mapScreen);
+							mapScreen.mapBots.forEach((k, v) -> v.increaseStatsAfterDead(30, 5, 2));
+							if (mapScreen.getPlayer().getClass().getSimpleName().equals("Wizard")) {
+								mapScreen.getPlayer().setMana(mapScreen.getPlayer().getMana() + 30);
+							}
+						}
 					}
 				}
 				System.out
@@ -203,6 +249,28 @@ public class ScreenSwitcher extends InputAdapter {
 			}
 		}
 		return new Object[] { false, "", -999 };
+	}
+
+	/**
+	 * 
+	 * @param playerX
+	 * @param playerY
+	 * @param monstersPos
+	 * @param monster
+	 * @param range
+	 * @return { names of monster in range}
+	 */
+	public String[] isMonsterInSpellRange(float playerX, float playerY, UniqueList<TextureMapObject> monster,
+			int range) {
+		List<String> names = new ArrayList<>();
+		for (int i = 0; i < monster.size(); i++) {
+			float distance = (float) Math
+					.sqrt(Math.pow(playerX - monster.get(i).getX(), 2) + Math.pow(playerY - monster.get(i).getY(), 2));
+			if (distance <= range) {
+				names.add(monster.get(i).getName());
+			}
+		}
+		return names.stream().toArray(String[]::new);
 	}
 
 	/**

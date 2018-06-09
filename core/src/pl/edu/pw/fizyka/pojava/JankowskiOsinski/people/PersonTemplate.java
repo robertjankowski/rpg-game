@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.math.Vector2;
 
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.Constants;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.MyMusic;
 import pl.edu.pw.fizyka.pojava.JankowskiOsinski.map.MapScreen;
+import pl.edu.pw.fizyka.pojava.JankowskiOsinski.utils.UniqueList;
 
 public abstract class PersonTemplate extends Person {
 
@@ -121,11 +123,6 @@ public abstract class PersonTemplate extends Person {
 		walkBatch.dispose();
 		walkSheet.dispose();
 		super.dispose();
-	}
-
-	public boolean isCollideWithBots(Bot bot) {
-		// do dokonczenia !
-		return false;
 	}
 
 	public abstract int attack(Bot bot);
